@@ -1,0 +1,19 @@
+{
+  "name": "Zoya AI Voice Assistant",
+  "short_name": "Zoya AI",
+  "description": "Zoya AI Voice Assistant by Royal Ankit Ahiran",
+  "start_url": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui", "window-controls-overlay"],
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg?v=20261009",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

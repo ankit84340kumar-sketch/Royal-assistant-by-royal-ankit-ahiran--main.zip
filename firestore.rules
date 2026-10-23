@@ -1,0 +1,135 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Developer / Administrator authorization
+    function isDeveloperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email.lower() == "ankit84340kumar@gmail.com".lower() &&
+        request.auth.token.email_verified == true
+      );
+    }
+
+    // Default Deny Root
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // User Account & Private History Subcollections
+    // -------------------------------------------------------------------------
+    match /users/{userId} {
+      // User can read and write only their own account document.
+      // Developer admin can inspect users in admin portal.
+      allow read: if isOwner(userId) || isDeveloperAdmin();
+      allow write: if isOwner(userId) || isDeveloperAdmin();
+
+      // Subcollections: messages, voiceHistory, topics
+      match /messages/{messageId} {
+        allow read, write: if isOwner(userId) || isDeveloperAdmin();
+      }
+
+      match /voiceHistory/{voiceId} {
+        allow read, write: if isOwner(userId) || isDeveloperAdmin();
+      }
+
+      match /topics/{topicId} {
+        allow read, write: if isOwner(userId) || isDeveloperAdmin();
+      }
+
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(userId) || isDeveloperAdmin();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Account Directory (Indexed by accountId / email key)
+    // -------------------------------------------------------------------------
+    match /accounts/{accountId} {
+      // Users can only access account docs matching their auth UID or verified admin
+      allow read: if isDeveloperAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      // Registration enforces that account uid matches caller's authenticated uid
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isDeveloperAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+    }
+
+    // -------------------------------------------------------------------------
+    // Verification Codes (OTP / Password Reset)
+    // -------------------------------------------------------------------------
+    match /verification_codes/{codeId} {
+      // Client read/write blocked completely. OTP generation & verification handled strictly on server via Admin SDK.
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Bug Reports
+    // -------------------------------------------------------------------------
+    match /bug_reports/{reportId} {
+      // Anyone can submit a bug report
+      allow create: if true;
+      // Only developer administrator can read all bug reports or triage/update/delete them
+      allow read: if isDeveloperAdmin();
+      allow update, delete: if isDeveloperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // User Inquiries & Developer Dispatches
+    // -------------------------------------------------------------------------
+    match /user_developer_queries/{queryId} {
+      // Users can only read their own inquiries and developer replies; admin can read all
+      allow read: if isDeveloperAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isDeveloperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // App Settings (Remote Feature Toggles)
+    // -------------------------------------------------------------------------
+    match /app_settings/{settingId} {
+      // Publicly readable so client apps respect maintenance mode & feature switches
+      allow read: if true;
+      // Strictly writable ONLY by authorized developer administrator
+      allow write: if isDeveloperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // System Broadcasts (Maintenance Banners / Alerts)
+    // -------------------------------------------------------------------------
+    match /system_broadcasts/{broadcastId} {
+      // Publicly readable for active broadcast alerts
+      allow read: if true;
+      // Strictly writable ONLY by authorized developer administrator
+      allow write: if isDeveloperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Admin Audit Logs
+    // -------------------------------------------------------------------------
+    match /admin_audit_logs/{logId} {
+      // Admin audit records can only be read and managed by developer administrator
+      allow read, write: if isDeveloperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Trial Devices & Admin Stats (Legacy collections secured)
+    // -------------------------------------------------------------------------
+    match /trial_devices/{deviceId} {
+      allow read, write: if isDeveloperAdmin();
+    }
+
+    match /admin_stats/{statId} {
+      allow read, write: if isDeveloperAdmin();
+    }
+  }
+}

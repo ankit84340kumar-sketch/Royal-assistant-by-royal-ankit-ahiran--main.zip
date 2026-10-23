@@ -1,0 +1,139 @@
+{
+  "entities": {
+    "User": {
+      "path": "users/{userId}",
+      "fields": {
+        "uid": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "photoURL": {
+          "type": "string"
+        },
+        "lastLogin": {
+          "type": "string"
+        }
+      }
+    },
+    "Message": {
+      "path": "users/{userId}/messages/{messageId}",
+      "fields": {
+        "id": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
+    "VoiceHistory": {
+      "path": "users/{userId}/voiceHistory/{voiceId}",
+      "fields": {
+        "id": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "transcript": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      }
+    },
+    "VoiceTopic": {
+      "path": "users/{userId}/topics/{topicId}",
+      "fields": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "number"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "messageCount": {
+          "type": "number"
+        },
+        "messages": {
+          "type": "array"
+        }
+      }
+    },
+    "Account": {
+      "path": "accounts/{accountId}",
+      "fields": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "passwordHash": { "type": "string" },
+        "emailVerified": { "type": "boolean" },
+        "accountStatus": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "lastLogin": { "type": "string" }
+      }
+    },
+    "VerificationCode": {
+      "path": "verification_codes/{codeId}",
+      "fields": {
+        "email": { "type": "string" },
+        "code": { "type": "string" },
+        "type": { "type": "string" },
+        "attempts": { "type": "number" },
+        "expiresAt": { "type": "number" },
+        "createdAt": { "type": "number" }
+      }
+    },
+    "TrialDevice": {
+      "path": "trial_devices/{deviceId}",
+      "fields": {
+        "deviceId": { "type": "string" },
+        "usedSeconds": { "type": "number" },
+        "remainingSeconds": { "type": "number" },
+        "engaged": { "type": "boolean" },
+        "firstEngagedAt": { "type": "string" },
+        "lastUpdatedAt": { "type": "string" },
+        "ipHash": { "type": "string" }
+      }
+    },
+    "AdminStats": {
+      "path": "admin_stats/{statId}",
+      "fields": {
+        "totalTrialSessions": { "type": "number" },
+        "lastUpdated": { "type": "string" }
+      }
+    }
+  }
+}
